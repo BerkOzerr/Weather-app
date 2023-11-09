@@ -1,7 +1,7 @@
-import { apiKey } from "./key.js";
+import { apiKey, api_Key } from "./key.js";
 
 const apiConnect = `https://api.openweathermap.org/data/2.5/weather?units=metric&q=istanbul&appid=${apiKey}`; //apiKey is your key
-
+let timeApiUrl = "https://timezone.abstractapi.com/v1/current_time/" + api_Key;
 checkWeather(apiConnect);
 
 let cInput = document.getElementById("city-input");
@@ -28,7 +28,6 @@ function cityWeather() {
 }
 
 async function checkWeather(apiConnect) {
-  const time = new Date().getHours();
   const response = await fetch(apiConnect);
   var data = await response.json();
   document.querySelector(
@@ -40,9 +39,20 @@ async function checkWeather(apiConnect) {
   document.querySelector(".wind").innerHTML = `${Math.round(
     data.wind.speed
   )} km/h`;
+  let finalUrl = timeApiUrl + `&location=${data.name}`;
+
+  timeResult(finalUrl);
+}
+
+async function timeResult(url) {
+  const res = await fetch(url);
+  const data = await res.json();
+  const time = new Date(data.datetime).getHours();
+
   if (time >= 6 && time <= 19) {
     weatherIcon.style.filter = "grayscale(0)";
   } else {
     weatherIcon.style.filter = "grayscale(80%)";
   }
+  return time;
 }
